@@ -2,9 +2,12 @@
 // Licensed under the MIT license.
 // See LICENSE file in the project root for full license information.
 
+using Entities.Components;
+using Entities.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended.ECS;
 
 namespace Entities
 {
@@ -12,12 +15,16 @@ namespace Entities
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
+        private World _world;
+        private Entity playerEntity;
 
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+
+
         }
 
         protected override void Initialize()
@@ -31,6 +38,15 @@ namespace Entities
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            _world = new WorldBuilder()
+                .AddSystem(new RenderSystem(_spriteBatch))
+                .AddSystem(new PlayerSystem())
+                .Build();
+
+            playerEntity = _world.CreateEntity();
+            playerEntity.Attach(Content.Load<Texture2D>("logo-square-128"));
+            playerEntity.Attach(new Player(100, new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2)));
+
             // TODO: use this.Content to load your game content here
         }
 
@@ -39,7 +55,7 @@ namespace Entities
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
+            _world.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -48,7 +64,7 @@ namespace Entities
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
+            _world.Draw(gameTime);
 
             base.Draw(gameTime);
         }
