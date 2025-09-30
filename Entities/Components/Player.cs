@@ -6,9 +6,9 @@ using Microsoft.Xna.Framework;
 
 namespace Entities.Components
 {
-    internal class Player
+    public class Player
     {
-        int speed = 100;
+        public int speed = 100;
         public Vector2 Position;
 
         public Player(int speed, Vector2 position)
